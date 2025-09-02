@@ -7,7 +7,7 @@
   sheet.appendRow(["Dernière actualisation : " + datedujour])
   sheet.appendRow(["--------------------------------------"])
   sheet_envoi = sheet.appendRow(["Logiciel","Version","A102","A103","A104","A105","A200","A201","A202","A203","A205","A300","A304","A307","B501","B502","C200","C303","CRDOC"]); 
-  sheet.setFrozenRows(3);
+  sheet.setFrozenRows(5);
   Logger.log("Ajout des logiciels de la A102")
   insertsheet("A102");
   Logger.log("Ajout des logiciels de la A103")
@@ -63,62 +63,61 @@
 }
 
 function col_salle(salle){
-  switch (salle) {
-    case "A102":
-      return "C";
-      break;
-    case "A103":
-      return "D";
-      break;
-    case "A104":
-      return "E";
-      break;
-    case "A105":
-      return "F";
-      break;
-    case "A200":
-      return "G";
-      break;
-    case "A201":
-      return "H";
-      break;
-    case "A202":
-      return "I";
-      break;
-    case "A203":
-      return "J";
-      break;
-    case "A205":
-      return "K";
-      break;
-    case "A300":
-      return "L";
-      break;
-    case "A304":
-      return "M";
-      break;
-    case "A307":
-      return "N";
-      break;
-    case "B501":
-      return "O";
-      break;
-    case "B502":
-      return "P";
-      break;
-    case "C200":
-      return "Q";
-      break;
-    case "C303":
-      return "R";
-      break;
-    case "CRDOC":
-      return "S";
+  if( salle =="A102" ){
+    return "C";
+  }
+  if( salle =="A103" ){
+    return "D";
+  }
+  if( salle =="A104" ){
+    return "E";
+  }
+  if( salle =="A105" ){
+    return "F";
+  }
+  if( salle =="A200" ){
+    return "G";
+  }
+  if( salle =="A201" ){
+    return "H";
+  }
+  if( salle =="A202" ){
+    return "I";
+  }
+  if( salle =="A203" ){
+    return "J";
+  }
+  if( salle =="A205" ){
+    return "K";
+  }
+  if( salle =="A300" ){
+    return "L";
+  }
+  if( salle =="A304" ){
+    return "M";
+  }
+  if( salle =="A307" ){
+    return "N";
+  }
+  if( salle =="B501" ){
+    return "O";
+  }
+  if( salle =="B502" ){
+    return "P";
+  }
+  if( salle =="C200" ){
+    return "Q";
+  }
+  if( salle =="C303" ){
+    return "R";
+  }
+  if( salle =="CRDOC" ){
+    return "S";
   }
 }
 
 function sheetId(){
-  return("SHEETID");
+  return("1agjrM3zPMM-kqjnfbnl54THq_xQRzGAOOqtShB0lyKQ");
 }
 
 function order(){
@@ -155,14 +154,12 @@ function gooddate(datepasgood){
   return(dategood);
 }
 
-function reset() {
-  const sheet = SpreadsheetApp.openById(sheetId());
-  const lastRow = sheet.getLastRow();
-  
-  // Si il y a des lignes à supprimer
-  if (lastRow > 0) {
-    // Supprime toutes les lignes en une seule opération
-    sheet.deleteRows(1, lastRow);
+function reset(){
+  var sh = SpreadsheetApp.openById(sheetId());
+  var values = sh.getDataRange().getValues();
+  //Logger.log(values.length);
+  for(var i=2, iLen=values.length; i<iLen; i++) {
+    sh.deleteRow(3);
   }
 }
 
@@ -201,7 +198,7 @@ function insert_row(nom,version,salle){
     //Logger.log("Logiciel déjà présent dans le tableau");
   }
   else{
-    //Logger.log("Ajout de " + nom +" "+version)
+    Logger.log("Ajout de " + nom +" "+version)
     sheet_envoi = sheet.appendRow([nom,version]);
   } 
 }
@@ -213,8 +210,6 @@ function insertsheet(salle){
   // Ouverture du tableau
   Object.keys(search).forEach(item => insert_row(search[item]["name"],search[item]["version"],salle))
 }
-
-
 
 //////////////////////////////////////////////////////////////////////////////////
 /////////////////////////            PAGE WEB            /////////////////////////
@@ -300,10 +295,6 @@ function cherche_soft(soft){
   search = search_in_salle(soft,"C200")
   if(search != false){
     liste = liste + " - C200<br>";
-  }
-  search = search_in_salle(soft,"C303")
-  if(search != false){
-    liste = liste + " - C303<br>";
   }
 
   liste = liste +"</div><br><br>"

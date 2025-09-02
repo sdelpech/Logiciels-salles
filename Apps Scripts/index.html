@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<base target="_top">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+		
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body onload="chargement();">
+		<div class="container">
+		  <p class="h1 mb-4 text-center" style="margin-top : ">Les logiciels à l' IUT</p>
+		  <div class="row">
+			<div class="col">                 
+			  <form id="soft" onsubmit="envoi_form_soft(this);">
+				<p classe="h1 mb-4 text-center">Savoir dans quelles salles est installé un logiciel :</p>
+				<select class="form-select form-select-lg-6" id="liste-logiciels" aria-label="Choisir un logiciel" ></select>
+				<div id="output-soft" style="padding:0px 20px 0px 20px"></div> 
+				<button type="submit" class="btn btn-primary btn-block">Rechercher le logiciel</button>
+			  </form>
+			</div>
+			<div class="col">                 
+				<form id="salle" onsubmit="envoi_form_salle(this);">
+				  <p classe="h1 mb-4 text-center">Savoir quels sont les logiciels installés dans une salle :</p>
+				  <select class="form-select form-select-lg-6" id="liste-salle" aria-label="Choisir une salle" >
+					<option selected>Selectionnez une salle</option>
+					<option value="A102">A102</option>
+					<option value="A103">A103</option>
+					<option value="A104">A104</option>
+					<option value="A105">A105</option>
+					<option value="A200">A200</option>
+					<option value="A201">A201</option>
+					<option value="A202">A202</option>
+					<option value="A203">A203</option>
+					<option value="A205">A205</option>
+					<option value="A300">A300</option>
+					<option value="A304">A304</option>
+					<option value="A307">A307</option>
+					<option value="B501">B501</option>
+					<option value="B502">B502</option>
+					<option value="C200">C200</option>
+				  </select>
+				  <div id="output-salle" style="padding:0px 20px 0px 20px"></div> <br><br>
+				  <button type="submit" class="btn btn-primary btn-block">Rechercher les logiciels de la salle</button><br><br><br>
+				</form>
+			</div>
+		  </div>
+		  <div id="">
+			Pour demander l'installation d'un logiciel dans une salle vous pouvez en faire la demande à cette adresse : <a href="mailto:support@iut-rodez.fr">support@iut-rodez.fr</href>
+		  </div>          
+		</div> 
+		<script>
+		  function chargement(){
+			rempli_select_soft(google.script.run.withSuccessHandler(rempli_select_soft).getSelectSoft());
+
+		  }
+
+		  function rempli_select_soft(datasoft){
+			document.getElementById("liste-logiciels").innerHTML = datasoft; 
+		  }
+
+		  function envoi_form_soft(formulaire){
+			var soft = document.getElementById("liste-logiciels").value;
+			document.getElementById("output-soft").innerHTML="<br><br><div class='alert alert-warning mb-2' role='alert'>Recherche en cours ...</div><br><br>";
+			google.script.run.withSuccessHandler(resultatsoft).cherche_soft(soft);
+		  }
+
+		  function envoi_form_salle(formulaire){
+			var salle = document.getElementById("liste-salle").value;
+			document.getElementById("output-salle").innerHTML="<br><br><div class='alert alert-warning mb-2' role='alert'>Recherche en cours ...</div><br><br>";
+			google.script.run.withSuccessHandler(resultatsalle).cherche_salle(salle);
+		  }
+
+		  function resultatsoft(retoursoft){
+			document.getElementById("output-soft").innerHTML = "";
+			document.getElementById("output-soft").innerHTML = retoursoft;
+		  }
+
+		  function resultatsalle(retoursalle){
+			document.getElementById("output-salle").innerHTML = "";
+			document.getElementById("output-salle").innerHTML = retoursalle;
+		  }
+
+		  function preventFormSubmit() {
+			var forms = document.querySelectorAll('form');
+			for (var i = 0; i < forms.length; i++) {
+			  forms[i].addEventListener('submit', function(event) {
+			  event.preventDefault();
+			  });
+			}
+		  }
+		  window.addEventListener('load', preventFormSubmit);   
+		</script>
+	</body>
+</html>

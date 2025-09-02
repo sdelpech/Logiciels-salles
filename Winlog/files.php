@@ -4,7 +4,6 @@ $remote_addr = $_SERVER["REMOTE_ADDR"];
 
 $donnees="";
 $salle="";
-$ip = "Adresse de sortie";
 
 function infiltre($soft){
 	$jsonfilter = file_get_contents("filter.json");
@@ -21,7 +20,7 @@ function infiltre($soft){
 	return($res);
 }
 
-if($remote_addr == $ip){
+if($remote_addr == "193.54.203.144"){
 	$data = $_POST["donnees"];
 	//echo $data;
 	$salle = $_POST["salle"];
