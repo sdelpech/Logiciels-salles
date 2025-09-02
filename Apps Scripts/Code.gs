@@ -1,65 +1,89 @@
- function ajout_lignes_logiciel(){
+function getFilteredSoftware() {
+  // List of software to exclude from the spreadsheet
+  var excludedSoftware = [
+    "NVIDIA Pilote audio HD 1.4.3.2",
+    "EShare",
+    "Epson iProjection Ver.4.02",
+    "Eclipse Temurin JRE avec Hotspot 8u402-b06 (x64)",
+    "NVIDIA Pilote audio HD 1.4.3.2",
+    "NVIDIA Pilote graphique 572.83",
+    "NVIDIA RTX Desktop Manager 205.28",
+    "Package for GodotEngin",
+    "Print Client",
+    "Teams Machine-Wide Installer",
+    "U-WAVEPAK Ver1.022B",
+    "WAPTAgent Community 1.8.2.7393",
+    "Windows Subsystem for Linux",
+    // Add more software names to exclude here
+  ];
+  return excludedSoftware;
+}
+
+function isExcludedSoftware(softwareName) {
+  var excludedList = getFilteredSoftware();
+  return excludedList.indexOf(softwareName) !== -1;
+}
+
+function ajout_lignes_logiciel(){
   var aujourdhui = new Date();
   var datedujour = aujourdhui.toISOString();
   datedujour = gooddate(datedujour)
   reset();
-  var sheet = SpreadsheetApp.openById(sheetId());
+  var spreadsheet = SpreadsheetApp.openById(sheetId());
+  var sheet = spreadsheet.getActiveSheet();
+  
+  // Add title row with formatting
+  sheet.appendRow(["Logiciels par Salles"]);
+  var titleRange = sheet.getRange("A1");
+  titleRange.setFontWeight("bold");
+  titleRange.setFontSize(18);
+  
   sheet.appendRow(["Dernière actualisation : " + datedujour])
   sheet.appendRow(["--------------------------------------"])
   sheet_envoi = sheet.appendRow(["Logiciel","Version","A102","A103","A104","A105","A200","A201","A202","A203","A205","A300","A304","A307","B501","B502","C200","C303","CRDOC"]); 
-  sheet.setFrozenRows(5);
-  Logger.log("Ajout des logiciels de la A102")
-  insertsheet("A102");
-  Logger.log("Ajout des logiciels de la A103")
-  insertsheet("A103");
-  Logger.log("Ajout des logiciels de la A104")
-  insertsheet("A104");
-  Logger.log("Ajout des logiciels de la A105")
-  insertsheet("A105");
-  Logger.log("Ajout des logiciels de la A200")
-  insertsheet("A200");
-  Logger.log("Ajout des logiciels de la A201")
-  insertsheet("A201");
-  Logger.log("Ajout des logiciels de la A202")
-  insertsheet("A202");
-  Logger.log("Ajout des logiciels de la A203")
-  insertsheet("A203");
-  Logger.log("Ajout des logiciels de la A205")
-  insertsheet("A205");
-  Logger.log("Ajout des logiciels de la A300")
-  insertsheet("A300");
-  Logger.log("Ajout des logiciels de la A304")
-  insertsheet("A304");
-  Logger.log("Ajout des logiciels de la A307")
-  insertsheet("A307");
-  Logger.log("Ajout des logiciels de la B501")
-  insertsheet("B501");
-  Logger.log("Ajout des logiciels de la B502")
-  insertsheet("B502");
-  Logger.log("Ajout des logiciels de la C200")
-  insertsheet("C200");
-  Logger.log("Ajout des logiciels de la C303")
-  insertsheet("C303");
-  Logger.log("Ajout des logiciels de la CRDOC")
-  insertsheet("CRDOC");
+  
+  // Format header row in bold
+  var headerRange = sheet.getRange("A4:S4");
+  headerRange.setFontWeight("bold");
+  
+  // Center align column B (Version column)
+  var columnBRange = sheet.getRange("B:B");
+  columnBRange.setHorizontalAlignment("center");
+  
+  sheet.setFrozenRows(3);
+  
+  // Batch process all rooms at once instead of individual calls
+  var rooms = ["A102", "A103", "A104", "A105", "A200", "A201", "A202", "A203", "A205", "A300", "A304", "A307", "B501", "B502", "C200", "C303", "CRDOC"];
+  
+  // Collect all unique software from all rooms
+  var allSoftware = new Map();
+  Logger.log("Récupération des données de toutes les salles...");
+  
+  rooms.forEach(room => {
+    var fileread = getjson(room);
+    var search = JSON.parse(fileread).result;
+    Object.keys(search).forEach(item => {
+      var soft = search[item];
+      // Filter out excluded software
+      if (!allSoftware.has(soft.name) && !isExcludedSoftware(soft.name)) {
+        allSoftware.set(soft.name, soft.version);
+      }
+    });
+  });
+  
+  // Insert all unique software at once using batch operation
+  if (allSoftware.size > 0) {
+    var rowsToAdd = Array.from(allSoftware).map(([name, version]) => [name, version]);
+    Logger.log("Ajout de " + rowsToAdd.length + " logiciels en lot");
+    var startRow = sheet.getLastRow() + 1;
+    sheet.getRange(startRow, 1, rowsToAdd.length, 2).setValues(rowsToAdd);
+  }
+  
   order();
-  coche_salle("A102");
-  coche_salle("A103");
-  coche_salle("A104");
-  coche_salle("A105");
-  coche_salle("A200");
-  coche_salle("A201");
-  coche_salle("A202");
-  coche_salle("A203");
-  coche_salle("A205");
-  coche_salle("A300");
-  coche_salle("A304");
-  coche_salle("A307");
-  coche_salle("B501");
-  coche_salle("B502");
-  coche_salle("C200");
-  coche_salle("C303");
-  coche_salle("CRDOC");
+  
+  // Batch process room checkmarks
+  Logger.log("Application des couleurs...");
+  rooms.forEach(room => coche_salle(room));
 }
 
 function col_salle(salle){
@@ -122,7 +146,7 @@ function sheetId(){
 
 function order(){
   sheet = SpreadsheetApp.openById(sheetId());
-  sheet.getRange("A6:Q300").sort(1);
+  sheet.getRange("A6:S300").sort(1);
 }
 
 function getjson(salle){
@@ -155,33 +179,58 @@ function gooddate(datepasgood){
 }
 
 function reset(){
-  var sh = SpreadsheetApp.openById(sheetId());
-  var values = sh.getDataRange().getValues();
-  //Logger.log(values.length);
-  for(var i=2, iLen=values.length; i<iLen; i++) {
-    sh.deleteRow(3);
-  }
+  var sheet = SpreadsheetApp.openById(sheetId());
+  // Clear all content using the correct method
+  sheet.getDataRange().clear();
+  // Reset formatting
+  sheet.getDataRange().clearFormat();
+  // Reset frozen rows
+  sheet.setFrozenRows(0);
 }
 
 function coche_salle(salle){
-  //salle="A201"
   var fileread = getjson(salle);
-  var search = JSON.parse(fileread).result
-  // Ouverture du tableau
-  Object.keys(search).forEach(item => coche_case(search[item]["name"],salle))
+  var search = JSON.parse(fileread).result;
+  var sheet = SpreadsheetApp.openById(sheetId()).getActiveSheet();
+  var values = sheet.getDataRange().getValues();
+  
+  // Build a map of software names to row numbers for faster lookup
+  var softwareRowMap = {};
+  for(var i = 0; i < values.length; i++) {
+    if(values[i][0]) {
+      softwareRowMap[values[i][0]] = i + 1;
+    }
+  }
+  
+  // Collect all cells to color for this room
+  var cellsToColor = [];
+  var salle_colone = col_salle(salle);
+  
+  Object.keys(search).forEach(item => {
+    var softName = search[item]["name"];
+    // Only color cells for software that's not excluded
+    if(softwareRowMap[softName] && !isExcludedSoftware(softName)) {
+      cellsToColor.push(salle_colone + softwareRowMap[softName]);
+    }
+  });
+  
+  // Apply all colors at once using batch operation
+  if(cellsToColor.length > 0) {
+    cellsToColor.forEach(cellule => {
+      sheet.getRange(cellule).setBackgroundColor('#1A9900');
+    });
+  }
 }
 
 function coche_case(soft,salle){
-  soft_row = isDansletab(soft);
-  salle_colone = col_salle(salle)
-  cellule = salle_colone + soft_row;
-  //Logger.log("Cellule à colorer : " + cellule)
-  sheet = SpreadsheetApp.openById(sheetId());
-  sheet.getRange(cellule).setBackgroundColor('#1A9900');
+  // This function is now handled by the optimized coche_salle
+  // Keep for compatibility
 }
 
 function isDansletab(searchString) {
-  var sh = SpreadsheetApp.openById(sheetId());
+  // This function is now optimized within coche_salle
+  // Keep for compatibility with other functions
+  var sh = SpreadsheetApp.openById(sheetId()).getActiveSheet();
   var values = sh.getDataRange().getValues();
   for(var i=0, iLen=values.length; i<iLen; i++) {
     if(values[i][0] == searchString) {
