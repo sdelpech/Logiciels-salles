@@ -14,6 +14,22 @@ function getFilteredSoftware() {
     "U-WAVEPAK Ver1.022B",
     "WAPTAgent Community 1.8.2.7393",
     "Windows Subsystem for Linux",
+    "Microsoft Office LTSC Professional Plus 2024 - uk-ua",
+    "Microsoft Office LTSC Professional Plus 2024 - uk-ua.proof",
+    "Microsoft Office LTSC Professional Plus 2024 - en-us",
+    "Microsoft Office LTSC Professional Plus 2024 - en-us.proof",
+    "Microsoft Office LTSC Professional Plus 2024 - en-us.proof",
+    "Microsoft Project Professional 2021 - uk-ua.proof",
+    "Microsoft Project Professional 2024 - en-us",
+    "Microsoft Project Professional 2024 - en-us.proof",
+    "Microsoft Project Professional 2024 - uk-ua",
+    "Microsoft Project Professional 2024 - uk-ua.proof",
+    "Microsoft Visio LTSC Professional 2024 - en-us",
+    "Microsoft Visio LTSC Professional 2024 - en-us.proof",
+    "Microsoft Visio LTSC Professional 2024 - uk-ua",
+    "Microsoft Visio LTSC Professional 2024 - uk-ua.proof",
+    "Microsoft Project Professional 2021 - en-us.proof",
+    "CC0825"
     // Add more software names to exclude here
   ];
   return excludedSoftware;
@@ -38,7 +54,7 @@ function ajout_lignes_logiciel(){
   titleRange.setFontWeight("bold");
   titleRange.setFontSize(18);
   
-  sheet.appendRow(["Dernière actualisation : " + datedujour])
+  sheet.appendRow(["Dernière actualisation : " + datedujour]) 
   sheet.appendRow(["--------------------------------------"])
   sheet_envoi = sheet.appendRow(["Logiciel","Version","A102","A103","A104","A105","A200","A201","A202","A203","A205","A300","A304","A307","B501","B502","C200","C303","CRDOC"]); 
   
@@ -50,7 +66,7 @@ function ajout_lignes_logiciel(){
   var columnBRange = sheet.getRange("B:B");
   columnBRange.setHorizontalAlignment("center");
   
-  sheet.setFrozenRows(3);
+  sheet.setFrozenRows(4);
   
   // Batch process all rooms at once instead of individual calls
   var rooms = ["A102", "A103", "A104", "A105", "A200", "A201", "A202", "A203", "A205", "A300", "A304", "A307", "B501", "B502", "C200", "C303", "CRDOC"];
